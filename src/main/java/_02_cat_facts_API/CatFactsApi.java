@@ -1,9 +1,14 @@
 package _02_cat_facts_API;
 
 import _02_cat_facts_API.data_transfer_objects.CatWrapper;
+
+import java.util.List;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import _01_intro_to_APIs.data_transfer_objects.Result;
 import reactor.core.publisher.Mono;
 
 /*
@@ -34,16 +39,24 @@ public class CatFactsApi {
         Use the WebClient to make the request, converting the response to String.class.
         This request doesn't require url parameters, so you can omit the .uri() method call entirely
         */
-
+    	 Mono<String> stringMono = webClient
+         		.get()
+                 .uri(uriBuilder -> uriBuilder
+                         .queryParam("q", "Java")
+                         .build())
+                 .retrieve()
+                 .bodyToMono(String.class);
 
         //Collect the response from the Mono object
+    	 String response = stringMono.block();
 
+         
 
         /*
         Print out the actual JSON response -
         this is what you will input into jsonschema2pojo.com
          */
-
+    	 System.out.println(response);
 
         /*
         Use http://www.jsonschema2pojo.org/ to generate your POJO
@@ -60,20 +73,29 @@ public class CatFactsApi {
 
         //Make the request, saving the response in an object of the type that you just created in your
         //data_transfer_objects package (CatWrapper)
-
+    	Mono<CatWrapper> catMono = webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .build())
+                .retrieve()
+                .bodyToMono(CatWrapper.class);
+    			
+    	
+       
         //Use block() to collect the response into a java object using the class you just created
-
+    	CatWrapper catWrap = catMono.block();
+    	List<String> catFact = catWrap.getData();
         //return the Object
-        return null;
+    	return catFact.get(0);
 
 
     }
 
     public String findCatFact(){
         //use the getCatFact method to retrieve a cat fact
-
+    	String fact = getCatFact();
         //return the first (and only) String in the Arraylist of data in the response
-        return null;
+        return fact;
     }
 
     public void setWebClient(WebClient webClient) {
