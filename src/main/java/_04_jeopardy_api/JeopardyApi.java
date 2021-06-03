@@ -4,6 +4,8 @@ import _04_jeopardy_api.data_transfer_objects.Clue;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import _02_cat_facts_API.data_transfer_objects.CatWrapper;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -38,13 +40,20 @@ public class JeopardyApi {
         //with the specified point value.
         //
         //Make sure to save the response as type Clue[].class in the bodyToMono() method call
-
+    	Mono<Clue[]> clue = webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder
+                        .build())
+                .retrieve()
+                .bodyToMono(Clue[].class);
         //2
         //Get a random number less than the size of the Clue array
-
+    	Random rand = new Random();
+    	Clue[] clueArr = clue.block();
+    	int random = rand.nextInt(clueArr.length);
         //3
         //return the clue at the random index you just created
 
-        return null;
+        return clueArr[random];
     }
 }
