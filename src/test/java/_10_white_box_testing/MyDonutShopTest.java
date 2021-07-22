@@ -14,27 +14,41 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class MyDonutShopTest {
-
+	@Mock
     MyDonutShop myDonutShop;
-
+    
+    @Mock
+    BakeryService bakeryService;
+    
+//    @Mock
+//    Order order;
+    
     @BeforeEach
     void setUp() {
-
+    	MockitoAnnotations.openMocks(this);
+    	
     }
 
     @Test
     void itShouldTakeDeliveryOrder() throws Exception {
         //given
-
+    	Order order = new Order("CUSTOMER_NAME",
+                "CUSTOMER_PHONE_NUMBER",
+                1,
+                5.00,
+                "CREDIT_CARD_NUMBER",
+                true);
         //when
-
+    	myDonutShop.takeOrder(order);
         //then
+    	verify(myDonutShop, times(1)).takeOrder(order);
+    		
     }
 
     @Test
     void givenInsufficientDonutsRemaining_whenTakeOrder_thenThrowIllegalArgumentException() {
         //given
-
+    	
         //when
 
         //then
