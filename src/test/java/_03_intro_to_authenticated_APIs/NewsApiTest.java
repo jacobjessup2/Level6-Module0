@@ -16,6 +16,7 @@ import _01_intro_to_APIs.data_transfer_objects.Result;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -44,6 +45,9 @@ class NewsApiTest {
     @Mock
     Mono<ApiExampleWrapper> resultMonoMock;
     
+    @Mock
+    Mono<Article[]> articleMonoMock;
+    
     @BeforeEach
     void setUp() {
     	MockitoAnnotations.openMocks(this);
@@ -55,7 +59,7 @@ class NewsApiTest {
     @Test
     void itShouldGetNewsStoryByTopic() {
         //given
-    	String topic = "Cows";
+    	String topic = "pizza";
 
     	ApiExampleWrapper result = new ApiExampleWrapper();
     	ApiExampleWrapper expectedResults = result;
@@ -70,8 +74,10 @@ class NewsApiTest {
                 .thenReturn(resultMonoMock);
         when(resultMonoMock.block())
                 .thenReturn(expectedResults);
+        
         //when
         ApiExampleWrapper actualResults = newsApi.getNewsStoryByTopic(topic);
+       
         //then
         verify(webClientMock, times(1)).get();
         assertEquals(expectedResults, actualResults);
@@ -81,33 +87,41 @@ class NewsApiTest {
     void itShouldFindStory(){
         //given
     	String topic = "Cows";
-        String bookTitle = "Rise of the Ruminants";
-        String bookLink = "www.cowtruth.com";
+    	String articleContent = "Cow Stuff";
+        String articleTitle = "Cow Article";
+        String articleURL = "www.cowArticleURL.com";
 
-        Result result = new Result();
-        result.setTitle(bookTitle);
-        result.setLink(bookLink);
-        Result[] expectedResults = {result};
-
+        ApiExampleWrapper wrapper = new ApiExampleWrapper();
+        	
+        Article result = new Article();
+        result.setTitle(articleTitle);
+        result.setUrl(articleURL);
+        result.setContent(articleContent);
+        
+        List<Article> expectedResults = new ArrayList<Article>();
+        expectedResults.add(result);
+        wrapper.setArticles(expectedResults);
         when(webClientMock.get())
                 .thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri((Function<UriBuilder, URI>) any()))
                 .thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve())
                 .thenReturn(responseSpecMock);
-        when(responseSpecMock.bodyToMono(Result[].class))
+        when(responseSpecMock.bodyToMono(ApiExampleWrapper.class))
                 .thenReturn(resultMonoMock);
         when(resultMonoMock.block())
-                .thenReturn(expectedResults);
+                .thenReturn(wrapper);
 
-        String expectedBook =
-                bookTitle + " -\n"
-                        + bookLink;
+        String expectedArticle =
+        		articleTitle + " -\n"
+                        + articleContent
+                        + "\nFull article: " + articleURL;
         //when
         String actualBook = newsApi.findStory(topic);
+        
         //then
         verify(webClientMock, times(1)).get();
-        assertEquals(expectedBook, actualBook);
+        assertEquals(expectedArticle, actualBook);
     }
 
 
